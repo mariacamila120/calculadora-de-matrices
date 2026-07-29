@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Gauss-Jordan con Procedimiento 🌸✨</title>
+    <link rel="shortcut icon" href="imagenes/icons8-cinta-100.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #fbcfe8 0%, #e0e7ff 100%);
+            color: #4b5563;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(244, 114, 182, 0.2);
+            border: 3px solid #fbcfe8;
+        }
+        h1 {
+            text-align: center;
+            color: #db2777;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .control-group {
+            margin-bottom: 25px;
+            text-align: center;
+            background: #fdf2f8;
+            padding: 15px;
+            border-radius: 15px;
+        }
+        label {
+            font-weight: 600;
+            color: #be185d;
+        }
+        select, button {
+            padding: 10px 18px;
+            font-size: 15px;
+            border-radius: 12px;
+            border: 2px solid #f472b6;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        select {
+            background-color: white;
+            color: #db2777;
+            font-weight: 600;
+        }
+        button {
+            background-color: #f472b6;
+            color: white;
+            font-weight: 700;
+            margin-left: 10px;
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.4);
+        }
+        button:hover {
+            background-color: #db2777;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(219, 39, 119, 0.4);
+        }
+        .matrix-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        .matrix-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.4s ease;
+        }
+        .matrix-row input {
+            width: 55px;
+            height: 45px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #fbcfe8;
+            border-radius: 12px;
+            background-color: #fffaf0;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .matrix-row input:focus {
+            border-color: #f472b6;
+            background-color: #ffffff;
+            box-shadow: 0 0 8px rgba(244, 114, 182, 0.3);
+        }
+        .matrix-row span {
+            font-weight: 600;
+            font-size: 15px;
+            color: #db2777;
+        }
+        .separator {
+            width: 3px;
+            height: 45px;
+            background-color: #f472b6;
+            border-radius: 2px;
+            margin: 0 8px;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fdf2f8;
+            border: 2px dashed #f472b6;
+            border-radius: 15px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            animation: popUp 0.4s ease;
+        }
+        #resultado h3 {
+            color: #db2777;
+            margin-top: 0;
+            text-align: center;
+        }
+        /* Estilos para las matrices de los pasos */
+        .step-matrix-box {
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #fbcfe8;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .step-desc {
+            font-weight: 700;
+            color: #be185d;
+            font-size: 13px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .cute-matrix {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        .cute-matrix td {
+            padding: 5px 10px;
+            text-align: center;
+            border: 1px solid #fbcfe8;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .cute-matrix .sep-col {
+            border-left: 2px solid #f472b6;
+            background-color: #fff1f2;
+            color: #db2777;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popUp {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ Calculadora Mágica ✨</h1>
+    <p class="subtitle">Gauss-Jordan paso a paso con matrices detalladas 🌸</p>
+    
+    <div class="control-group">
+        <label for="nSize">Tamaño del sistema: </label>
+        <select id="nSize" onchange="generarMatriz()">
+            <option value="2">2 x 2 🍓</option>
+            <option value="3" selected>3 x 3 🌸</option>
+            <option value="4">4 x 4 ⭐</option>
+        </select>
+        <button onclick="resolverGaussJordan()">¡Resolver con Matrices! 💖</button>
+    </div>
+
+    <div id="matrizInputs" class="matrix-container">
+        <!-- Generado por JS -->
+    </div>
+
+    <div id="resultado">
+        <h3>🌷 Procedimiento y Matrices 🌷</h3>
+        <div id="pasosContenido"></div>
+    </div>
+</div>
+
+<script>
+    function generarMatriz() {
+        const n = parseInt(document.getElementById('nSize').value);
+        const contenedor = document.getElementById('matrizInputs');
+        contenedor.innerHTML = '';
+
+        for (let i = 0; i < n; i++) {
+            let rowDiv = document.createElement('div');
+            rowDiv.className = 'matrix-row';
+
+            for (let j = 0; j < n; j++) {
+                let input = document.createElement('input');
+                input.type = 'number';
+                input.step = 'any';
+                input.id = `cell_${i}_${j}`;
+                input.value = (i === j) ? 1 : 0;
+                rowDiv.appendChild(input);
+
+                let span = document.createElement('span');
+                span.innerText = `x${j + 1}` + (j < n - 1 ? ' + ' : '');
+                rowDiv.appendChild(span);
+            }
+
+            let sep = document.createElement('div');
+            sep.className = 'separator';
+            rowDiv.appendChild(sep);
+
+            let inputInd = document.createElement('input');
+            inputInd.type = 'number';
+            inputInd.step = 'any';
+            inputInd.id = `cell_${i}_ind`;
+            inputInd.value = 0;
+            rowDiv.appendChild(inputInd);
+
+            contenedor.appendChild(rowDiv);
+        }
+        document.getElementById('resultado').style.display = 'none';
+    }
+
+    function matrizToHTML(m, n, mensaje) {
+        let html = `<div class="step-matrix-box"><div class="step-desc">${mensaje}</div><table class="cute-matrix">`;
+        for (let i = 0; i < n; i++) {
+            html += "<tr>";
+            for (let j = 0; j <= n; j++) {
+                let val = m[i][j];
+                if (Object.is(val, -0)) val = 0;
+                let formattedVal = Number.isInteger(val) ? val : val.toFixed(2);
+                if (j === n) {
+                    html += `<td class="sep-col">${formattedVal}</td>`;
+                } else {
+                    html += `<td>${formattedVal}</td>`;
+                }
+            }
+            html += "</tr>";
+        }
+        html += "</table></div>";
+        return html;
+    }
+
+    function resolverGaussJordan() {
+        const n = parseInt(document.getElementById('nSize').value);
+        let matriz = [];
+
+        for (let i = 0; i < n; i++) {
+            let fila = [];
+            for (let j = 0; j < n; j++) {
+                fila.push(parseFloat(document.getElementById(`cell_${i}_${j}`).value) || 0);
+            }
+            fila.push(parseFloat(document.getElementById(`cell_${i}_ind`).value) || 0);
+            matriz.push(fila);
+        }
+
+        let pasosHTML = `<h4 style="color: #db2777; text-align: center; margin-top: 5px;">🌸 Matrices paso a paso 🌸</h4>`;
+        
+        // Mostrar matriz inicial
+        pasosHTML += matrizToHTML(matriz, n, "Matriz aumentada inicial 🍓");
+
+        for (let i = 0; i < n; i++) {
+            let maxEl = Math.abs(matriz[i][i]);
+            let maxRow = i;
+            for (let k = i + 1; k < n; k++) {
+                if (Math.abs(matriz[k][i]) > maxEl) {
+                    maxEl = Math.abs(matriz[k][i]);
+                    maxRow = k;
+                }
+            }
+
+            if (maxRow !== i) {
+                let temp = matriz[i];
+                matriz[i] = matriz[maxRow];
+                matriz[maxRow] = temp;
+                pasosHTML += matrizToHTML(matriz, n, `🎀 Intercambiar Fila ${i + 1} con Fila ${maxRow + 1}`);
+            }
+
+            if (Math.abs(matriz[i][i]) < 1e-9) {
+                document.getElementById('resultado').style.display = 'block';
+                document.getElementById('pasosContenido').innerHTML = `<p style="color: #e11d48; text-align: center; font-weight: 600;">💫 Oh no! El sistema no tiene una solución única.</p>`;
+                return;
+            }
+
+            let pivote = matriz[i][i];
+            for (let j = i; j <= n; j++) {
+                matriz[i][j] /= pivote;
+            }
+            pasosHTML += matrizToHTML(matriz, n, `✨ Hacer 1 el pivote en posición (${i + 1}, ${i + 1}) [F${i + 1} / ${pivote.toFixed(2)}]`);
+
+            for (let k = 0; k < n; k++) {
+                if (k !== i) {
+                    let factor = matriz[k][i];
+                    for (let j = i; j <= n; j++) {
+                        matriz[k][j] -= factor * matriz[i][j];
+                    }
+                }
+            }
+            pasosHTML += matrizToHTML(matriz, n, `⭐ Hacer ceros en la columna ${i + 1} (excepto la diagonal)`);
+        }
+
+        pasosHTML += `<h4 style="color: #db2777; text-align: center; margin-top: 15px;">💖 Solución final 💖</h4>`;
+        for (let i = 0; i < n; i++) {
+            let valor = matriz[i][n];
+            if (Object.is(valor, -0)) valor = 0;
+            pasosHTML += `<p style="text-align: center; font-size: 15px;"><strong>✨ x${i + 1}</strong> = <span style="color: #db2777; font-weight: 700;">${valor.toFixed(4)}</span></p>`;
+        }
+
+        document.getElementById('resultado').style.display = 'block';
+        document.getElementById('pasosContenido').innerHTML = pasosHTML;
+    }
+
+    window.onload = function() {
+        generarMatriz();
+    };
+</script>
+
+</body>
+</html>
